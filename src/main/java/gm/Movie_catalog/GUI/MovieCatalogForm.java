@@ -59,10 +59,16 @@ public class MovieCatalogForm extends JFrame {
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
-        this.tablaModeloPeliculas = new DefaultTableModel(0,4);
+        this.tablaModeloPeliculas = new DefaultTableModel(0,4){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         String [] cabeceros = {"Id", "Nombre", "Año", "Puntuación"};
         this.tablaModeloPeliculas.setColumnIdentifiers(cabeceros);
         this.peliculasTabla = new JTable(this.tablaModeloPeliculas);
+        this.peliculasTabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         //Cargar listado de peliculas
         listarPeliculas();
     }
