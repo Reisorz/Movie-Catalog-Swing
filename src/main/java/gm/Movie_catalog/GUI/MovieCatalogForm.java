@@ -10,6 +10,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 @Component
@@ -26,12 +28,21 @@ public class MovieCatalogForm extends JFrame {
     private JButton limpiarButton;
     IPeliculaServicio peliculaServicio;
     private DefaultTableModel tablaModeloPeliculas;
+    private Integer idPelicula;
+
 
     @Autowired
     public MovieCatalogForm(PeliculaServicio peliculaServicio) {
         this.peliculaServicio = peliculaServicio;
         iniciarForma();
         guardarButton.addActionListener(e ->  guardarPelicula());
+        peliculasTabla.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                cargarPeliculaSeleccionada();
+            }
+        });
     }
 
 
@@ -74,20 +85,34 @@ public class MovieCatalogForm extends JFrame {
             nombreTexto.requestFocusInWindow();
             return;
         }
-        Pelicula peliculaGuardar = new Pelicula();
+
         String nombrePelicula = this.nombreTexto.getText();
         int yearPelicula = Integer.parseInt(this.yearTexto.getText());
         Double puntuacionPelicula = Double.parseDouble(this.puntuacionTexto.getText());
-        peliculaGuardar.setNombre(nombrePelicula);
-        peliculaGuardar.setYear(yearPelicula);
-        peliculaGuardar.setPuntuacion(puntuacionPelicula);
+        Pelicula peliculaGuardar = new Pelicula(idPelicula, nombrePelicula, yearPelicula, puntuacionPelicula);
         peliculaServicio.guardarPelicula(peliculaGuardar);
-        mostrarMensaje("Película guardada con éxito.");
+
+        if (idPelicula == null) {
+            mostrarMensaje("Película guardada con éxito.");
+        } else {
+            mostrarMensaje("Película actualizada con éxito");
+        }
         limpiarTexto();
         listarPeliculas();
+    }
 
-
-
+    private void cargarPeliculaSeleccionada() {
+        var renglonPelicula = peliculasTabla.getSelectedRow();
+        if(renglonPelicula != -1){
+            String id = peliculasTabla.getModel().getValueAt(renglonPelicula,0).toString();
+            this.idPelicula = Integer.parseInt(id);
+            String nombre = peliculasTabla.getModel().getValueAt(renglonPelicula,1).toString();
+            nombreTexto.setText(nombre);
+            String year = peliculasTabla.getModel().getValueAt(renglonPelicula,2).toString();
+            yearTexto.setText(year);
+            String puntuacion = peliculasTabla.getModel().getValueAt(renglonPelicula,3).toString();
+            puntuacionTexto.setText(puntuacion);
+        }
     }
 
     private void mostrarMensaje(String mensaje) {
@@ -98,5 +123,7 @@ public class MovieCatalogForm extends JFrame {
         this.nombreTexto.setText("");
         this.yearTexto.setText("");
         this.puntuacionTexto.setText("");
+        this.idPelicula = null;
+        this.peliculasTabla.getSelectionModel().clearSelection();
     }
 }
