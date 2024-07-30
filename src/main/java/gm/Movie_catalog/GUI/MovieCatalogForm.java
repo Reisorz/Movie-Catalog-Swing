@@ -43,6 +43,8 @@ public class MovieCatalogForm extends JFrame {
                 cargarPeliculaSeleccionada();
             }
         });
+        limpiarButton.addActionListener( e -> limpiarTexto());
+        eliminarButton.addActionListener(e -> eliminarPelicula());
     }
 
 
@@ -113,6 +115,21 @@ public class MovieCatalogForm extends JFrame {
             String puntuacion = peliculasTabla.getModel().getValueAt(renglonPelicula,3).toString();
             puntuacionTexto.setText(puntuacion);
         }
+    }
+
+    private void eliminarPelicula() {
+        if(idPelicula == null){
+            mostrarMensaje("Selecciona una película.");
+            return;
+        }
+        String nombrePelicula = this.nombreTexto.getText();
+        int yearPelicula = Integer.parseInt(this.yearTexto.getText());
+        Double puntuacionPelicula = Double.parseDouble(this.puntuacionTexto.getText());
+        Pelicula peliculaBorrar = new Pelicula(idPelicula, nombrePelicula, yearPelicula, puntuacionPelicula);
+        peliculaServicio.eliminarPelicula(peliculaBorrar);
+        mostrarMensaje("Película borrada con éxito.");
+        limpiarTexto();
+        listarPeliculas();
     }
 
     private void mostrarMensaje(String mensaje) {
