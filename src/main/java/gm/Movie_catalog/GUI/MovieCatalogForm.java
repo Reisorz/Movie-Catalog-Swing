@@ -26,6 +26,7 @@ public class MovieCatalogForm extends JFrame {
     private JTextField puntuacionTexto;
     private JButton eliminarButton;
     private JButton limpiarButton;
+    private JButton buscarButton;
     IPeliculaServicio peliculaServicio;
     private DefaultTableModel tablaModeloPeliculas;
     private Integer idPelicula;
@@ -45,6 +46,7 @@ public class MovieCatalogForm extends JFrame {
         });
         limpiarButton.addActionListener( e -> limpiarTexto());
         eliminarButton.addActionListener(e -> eliminarPelicula());
+        buscarButton.addActionListener(e -> buscarPelicula());
     }
 
 
@@ -138,6 +140,26 @@ public class MovieCatalogForm extends JFrame {
         listarPeliculas();
     }
 
+    private void buscarPelicula() {
+        if(nombreTexto.getText().equals("")){
+            mostrarMensaje("Proporciona un nombre para buscar.");
+            nombreTexto.requestFocusInWindow();
+            return;
+        }
+        String nombrePelicula = this.nombreTexto.getText();
+        List<Pelicula> peliculasBuscadas = peliculaServicio.buscarPeliculaPorNombre(nombrePelicula);
+        this.tablaModeloPeliculas.setRowCount(0);
+        peliculasBuscadas.forEach(pelicula -> {
+            Object[] renglonPelicula = {
+                    pelicula.getIdPelicula(),
+                    pelicula.getNombre(),
+                    pelicula.getYear(),
+                    pelicula.getPuntuacion()
+            };
+            this.tablaModeloPeliculas.addRow(renglonPelicula);
+        });
+    }
+
     private void mostrarMensaje(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje);
     }
@@ -148,5 +170,6 @@ public class MovieCatalogForm extends JFrame {
         this.puntuacionTexto.setText("");
         this.idPelicula = null;
         this.peliculasTabla.getSelectionModel().clearSelection();
+        listarPeliculas();
     }
 }
